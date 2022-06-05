@@ -3,7 +3,11 @@ use arboard::Clipboard;
 use chrono::{DateTime, Local};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use std::collections::VecDeque;
+use std::{
+    collections::VecDeque,
+    thread::{self, current},
+    time::Duration,
+};
 
 #[derive(Default)]
 struct History {
@@ -44,6 +48,10 @@ enum Commands {
     Remove {
         pattern: String,
     },
+    Daemon {
+        #[clap(default_value = "250")]
+        polling_rate: usize,
+    },
 }
 
 #[derive(Debug, Parser)]
@@ -57,12 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     // let history = History::default();
 
-    let history = {
-        let mut history = History::default();
-        history.items.push_back(HistoryItem::new("foo"));
-        history.items.push_back(HistoryItem::new("bar"));
-        history
-    };
+    let mut history = History::default();
 
     let mut clipboard = Clipboard::new().unwrap();
 
@@ -104,6 +107,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Remove { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
+        }
+        Commands::Daemon {
+            polling_rate: usize,
+        } => {
+            let polling_rate: usize = 250; // WHY?
+            println!("Starting daemon with polling rate {}...", polling_rate);
+
+            loop {
+                println!("Polling...");
+                let current_text = clipboard.get_text()?;
+
+                if history.items.len() == 0 {
+                    history.items.push_back(HistoryItem::new(current_text));
+                    continue;
+                } else {
+                    let latest_item = history.items.iter().last().unwrap();
+
+                    if latest_item.contents != current_text {
+                        println!("Detected change, adding item...");
+                        history.items.push_back(HistoryItem::new(current_text));
+                    }
+                }
+
+                thread::sleep(Duration::from_millis(polling_rate.try_into().unwrap()));
+            }
         }
     }
 
