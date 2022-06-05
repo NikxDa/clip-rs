@@ -68,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match args.command {
         Commands::List { amount, all } => {
-            let amount = amount.unwrap_or(if all { 10_usize } else { history.items.len() });
+            let amount = amount.unwrap_or(if all { history.items.len( } else { 10 });
 
             // let max_digits = (history.items.len() + 1).log10() + 1;
             // TOOD: Use this to format index instead of :03
