@@ -68,11 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match args.command {
         Commands::List { amount, all } => {
-            let amount = if all {
-                history.items.len()
-            } else {
-                amount.unwrap_or(10)
-            };
+            let amount = amount.unwrap_or(if all { 10_usize } else { history.items.len() });
 
             // let max_digits = (history.items.len() + 1).log10() + 1;
             // TOOD: Use this to format index instead of :03
@@ -109,16 +105,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /// Parse an offset pattern to find a specific history item index.
-/// 
+///
 /// Offset patterns are either a number or the character `~` followed by a number or nothing.
-/// 
+///
 /// # EBNF
 /// ```ebnf
 /// Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
 /// Number = { Digit };
 /// Pattern = Number | '~', [ Number ];
 /// ```
-/// 
+///
 /// # Behavior
 /// If the pattern is a number, it is interpreted as the index of the item to show.<br>
 /// If the pattern is `~`, it is interpreted as the index of the last item.<br>
