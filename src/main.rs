@@ -80,6 +80,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Show { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
+
+            if _index < history.items.len() {
+                let item = &history.items[_index];
+                println!("{}", item.contents);
+            } else {
+                println!(
+                    "No item with index: {index:03}",
+                    index = _index.to_string().yellow()
+                );
+            }
         }
         Commands::Copy { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
