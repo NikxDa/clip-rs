@@ -86,20 +86,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         Commands::Show { pattern } => {
-            let _index = parse_pattern(&history, pattern)?;
-
-            let item = &history.items[_index];
+            let index = parse_pattern(&history, pattern)?;
+            let item = &history.items[index];
             println!("{}", item.contents);
         }
         Commands::Copy { pattern } => {
-            let _index = parse_pattern(&history, pattern)?;
-
-            let item = &history.items[_index];
+            let index = parse_pattern(&history, pattern)?;
+            let item = &history.items[index];
             clipboard.set_text(item.contents.clone())?;
 
             println!(
                 "Successfully copied item {index} to the clipboard!",
-                index = _index.to_string().yellow()
+                index = index.to_string().yellow()
             )
         }
         Commands::Remove { pattern } => {
@@ -118,6 +116,7 @@ where
     let number_of_items: usize = history.items.len();
 
     let item_index = match pattern {
+        p if p.starts_with('~') && p.len() == 1 => number_of_items - 1,
         p if p.starts_with('~') => {
             let offset = p
                 .chars()
@@ -156,6 +155,7 @@ mod tests {
         assert_eq!(parse_pattern(&history, "0")?, 0);
         assert_eq!(parse_pattern(&history, "~0")?, 1);
         assert_eq!(parse_pattern(&history, "~1")?, 0);
+        assert_eq!(parse_pattern(&history, "~")?, 1);
 
         Ok(())
     }
