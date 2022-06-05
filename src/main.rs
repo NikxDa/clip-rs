@@ -108,10 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Remove { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
         }
-        Commands::Daemon {
-            polling_rate: usize,
-        } => {
-            let polling_rate: usize = 250; // WHY?
+        Commands::Daemon { polling_rate } => {
             println!("Starting daemon with polling rate {}...", polling_rate);
 
             loop {
