@@ -1,4 +1,5 @@
 use anyhow::{bail, Context};
+use arboard::Clipboard;
 use chrono::{DateTime, Local};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
@@ -63,6 +64,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         history
     };
 
+    let mut clipboard = Clipboard::new().unwrap();
+
     match args.command {
         Commands::List { amount, all } => {
             let amount = if all {
@@ -70,6 +73,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             } else {
                 amount.unwrap_or(10)
             };
+
+            // let max_digits = (history.items.len() + 1).log10() + 1;
+            // TOOD: Use this to format index instead of :03
+
             for (i, item) in history.items.iter().rev().take(amount).rev().enumerate() {
                 println!(
                     "{index:03} {content}",
@@ -86,6 +93,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Copy { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
+
+            let item = &history.items[_index];
+            clipboard.set_text(item.contents.clone())?;
+
+            println!(
+                "Successfully copied item {index} to the clipboard!",
+                index = _index.to_string().yellow()
+            )
         }
         Commands::Remove { pattern } => {
             let _index = parse_pattern(&history, pattern)?;
