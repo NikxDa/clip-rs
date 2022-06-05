@@ -108,6 +108,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+/// Parse an offset pattern to find a specific history item index.
+/// 
+/// Offset patterns are either a number or the character `~` followed by a number or nothing.
+/// 
+/// # EBNF
+/// ```ebnf
+/// Digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+/// Number = { Digit };
+/// Pattern = Number | '~', [ Number ];
+/// ```
+/// 
+/// # Behavior
+/// If the pattern is a number, it is interpreted as the index of the item to show.<br>
+/// If the pattern is `~`, it is interpreted as the index of the last item.<br>
+/// If the pattern is `~` followed by a number, it is interpreted as `len - number`.
 fn parse_pattern<S>(history: &History, pattern: S) -> anyhow::Result<usize>
 where
     S: AsRef<str>,
