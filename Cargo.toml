@@ -6,11 +6,18 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Easy error propagation
 anyhow = "1.0.57"
+# Clipboard handling
 arboard = "2.1.1"
+# Date and time handling
 chrono = "0.4.19"
+# CLI argument parsing
 clap = { version = "3.1.18", features = ["derive"] }
+# CLI color handling
 colored = "2.0.0"
+# Serialization/Deserialization
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
+# Async Runtime
 tokio = { version = "1.19.0", features = ["full"] }
